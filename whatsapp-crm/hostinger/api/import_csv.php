@@ -99,8 +99,9 @@ try {
     
     // Prepare insert statement
     $insertSql = "INSERT INTO leads (business_name, address, locality, city, state, phone_number, 
-                  website_url, website_status, rating, review_count, pitch_type, language_preference, created_at) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                  website_url, website_status, rating, review_count, pitch_type, language_preference, 
+                  whatsapp_status, outreach_status, created_at) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', NOW())
                   ON DUPLICATE KEY UPDATE updated_at = NOW()";
     $insertStmt = $db->prepare($insertSql);
     

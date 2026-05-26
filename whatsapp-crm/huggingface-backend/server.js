@@ -72,14 +72,52 @@ app.use('/api/message', authMiddleware, messageRoutes);
 app.use('/api/campaign', authMiddleware, campaignRoutes);
 app.use('/api/validation', authMiddleware, validationRoutes);
 
-// Root endpoint
+// Root endpoint - serves HTML for HF Spaces iframe display
 app.get('/', (req, res) => {
-    res.json({
-        service: 'WhatsApp CRM Engine',
-        status: 'running',
-        version: '1.0.0',
-        timestamp: new Date().toISOString()
-    });
+    const waStatus = whatsappService.getStatus();
+    res.send(`<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp CRM Engine</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0fdf4; display: flex; align-items: center; justify-content: center; min-height: 100vh; color: #111827; }
+        .container { text-align: center; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); max-width: 480px; width: 90%; }
+        .logo { width: 64px; height: 64px; background: #10b981; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .logo svg { width: 36px; height: 36px; fill: white; }
+        h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .version { color: #6b7280; font-size: 13px; margin-bottom: 20px; }
+        .status { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+        .status.online { background: #d1fae5; color: #059669; }
+        .status.offline { background: #fee2e2; color: #dc2626; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot.green { background: #10b981; animation: pulse 2s infinite; }
+        .dot.red { background: #dc2626; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .info { margin-top: 20px; font-size: 12px; color: #9ca3af; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .stat { background: #f8faf9; padding: 12px; border-radius: 10px; }
+        .stat .label { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat .value { font-size: 18px; font-weight: 700; color: #111827; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg></div>
+        <h1>WhatsApp CRM Engine</h1>
+        <p class="version">v1.0.0 • Node.js Backend</p>
+        <div class="status ${waStatus.isReady ? 'online' : 'offline'}">
+            <span class="dot ${waStatus.isReady ? 'green' : 'red'}"></span>
+            ${waStatus.isReady ? 'WhatsApp Connected' : 'WhatsApp Disconnected'}
+        </div>
+        <div class="stats">
+            <div class="stat"><div class="label">Server</div><div class="value">Active</div></div>
+            <div class="stat"><div class="label">Uptime</div><div class="value">${Math.floor(process.uptime() / 60)}m</div></div>
+        </div>
+        <p class="info">This is the backend engine. Access your dashboard on Hostinger.</p>
+    </div>
+</body>
+</html>`);
 });
 
 // 404 handler

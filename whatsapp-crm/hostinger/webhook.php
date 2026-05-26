@@ -106,9 +106,12 @@ function handleMessageReceived($db, $data) {
         return;
     }
     
-    // Find lead by phone
-    $stmt = $db->prepare("SELECT id, business_name, outreach_status FROM leads WHERE phone_number = ?");
-    $stmt->execute([$phone]);
+    // Find lead by phone - try exact match first, then normalized
+    $stmt = $db->prepare("SELECT id, business_name, outreach_status FROM leads WHERE phone_number = ? OR phone_number = ? OR phone_number = ?");
+    $cleanPhone = preg_replace('/[^\d]/', '', $phone);
+    $withoutCountry = (strlen($cleanPhone) === 12 && substr($cleanPhone, 0, 2) === '91') ? substr($cleanPhone, 2) : $cleanPhone;
+    $withCountry = (strlen($cleanPhone) === 10) ? '91' . $cleanPhone : $cleanPhone;
+    $stmt->execute([$cleanPhone, $withoutCountry, $withCountry]);
     $lead = $stmt->fetch();
     
     if (!$lead) {
@@ -168,10 +171,13 @@ function handleMessageSent($db, $data) {
     
     if (empty($phone)) return;
     
-    // Find lead
+    // Find lead with flexible phone matching
     if (!$leadId) {
-        $stmt = $db->prepare("SELECT id FROM leads WHERE phone_number = ?");
-        $stmt->execute([$phone]);
+        $cleanPhone = preg_replace('/[^\d]/', '', $phone);
+        $withoutCountry = (strlen($cleanPhone) === 12 && substr($cleanPhone, 0, 2) === '91') ? substr($cleanPhone, 2) : $cleanPhone;
+        $withCountry = (strlen($cleanPhone) === 10) ? '91' . $cleanPhone : $cleanPhone;
+        $stmt = $db->prepare("SELECT id FROM leads WHERE phone_number = ? OR phone_number = ? OR phone_number = ?");
+        $stmt->execute([$cleanPhone, $withoutCountry, $withCountry]);
         $lead = $stmt->fetch();
         $leadId = $lead ? $lead['id'] : null;
     }

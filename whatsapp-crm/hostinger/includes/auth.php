@@ -12,11 +12,9 @@
 function verifyWebhook() {
     $secret = getSetting('webhook_secret', WEBHOOK_SECRET);
     
+    // If no secret configured, allow all webhooks (for initial setup)
     if (empty($secret)) {
-        // If no secret configured, allow in development
-        if (APP_ENV === 'development') return true;
-        writeLog('Webhook secret not configured', 'WARNING');
-        return false;
+        return true;
     }
     
     $receivedSecret = $_SERVER['HTTP_X_WEBHOOK_SECRET'] ?? '';

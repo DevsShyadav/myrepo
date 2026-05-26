@@ -69,8 +69,8 @@ function cleanPhone($phone) {
         $cleaned = '91' . $cleaned;
     } elseif (strlen($cleaned) === 11 && $cleaned[0] === '0') {
         $cleaned = '91' . substr($cleaned, 1);
-    } elseif (strlen($cleaned) === 13 && substr($cleaned, 0, 3) === '+91') {
-        $cleaned = substr($cleaned, 1);
+    } elseif (strlen($cleaned) === 12 && substr($cleaned, 0, 2) === '91') {
+        // Already correct format with 91 prefix
     }
     
     return $cleaned;

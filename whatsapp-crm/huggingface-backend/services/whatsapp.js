@@ -41,10 +41,6 @@ function init(socketIo) {
                 '--disable-extensions'
             ],
             executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
-        },
-        webVersionCache: {
-            type: 'remote',
-            remotePath: 'https://raw.githubusercontent.com/niclasleonbock/whatsapp-web-reveng/master/webversion/webVersion.json'
         }
     });
 

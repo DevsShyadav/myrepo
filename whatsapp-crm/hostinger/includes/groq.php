@@ -188,10 +188,10 @@ function buildPrompt($lead) {
         $prompt .= "Google Rating: {$rating}/5 stars";
         if ($reviews > 0) {
             $prompt .= " with {$reviews} reviews";
-            if ($reviews > 100) {
-                $prompt .= " (that's impressive for a local business!)";
-            } elseif ($reviews > 500) {
+            if ($reviews > 500) {
                 $prompt .= " (that's SERIOUSLY impressive — top-tier trust)";
+            } elseif ($reviews > 100) {
+                $prompt .= " (that's impressive for a local business!)";
             }
         }
         $prompt .= "\n";

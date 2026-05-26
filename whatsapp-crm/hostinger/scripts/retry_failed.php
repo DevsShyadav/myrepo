@@ -32,11 +32,9 @@ try {
     // Get failed leads that haven't exceeded retry limit
     // We track retries by counting failed messages for the lead
     $stmt = $db->prepare(
-        "SELECT l.*, 
-         (SELECT COUNT(*) FROM messages WHERE lead_id = l.id AND status = 'failed') as fail_count
-         FROM leads l 
+        "SELECT l.* FROM leads l 
          WHERE l.outreach_status = 'failed' 
-         HAVING fail_count < ?
+         AND (SELECT COUNT(*) FROM messages WHERE lead_id = l.id AND status = 'failed') < ?
          LIMIT 10"
     );
     $stmt->execute([$retryLimit]);
