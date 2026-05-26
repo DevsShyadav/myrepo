@@ -281,28 +281,77 @@ function buildReasoning($lead) {
 
 /**
  * Generate fallback message when AI is unavailable
+ * Uses actual lead data for deep personalization
  * 
  * @param array $lead Lead data
  * @return string Fallback message
  */
 function generateFallbackMessage($lead) {
-    $name = $lead['business_name'];
+    $name = $lead['business_name'] ?? 'Business';
+    $locality = $lead['locality'] ?? '';
     $city = $lead['city'] ?? '';
-    $language = $lead['language_preference'];
+    $state = $lead['state'] ?? '';
+    $rating = $lead['rating'] ?? '';
+    $reviews = $lead['review_count'] ?? 0;
+    $language = $lead['language_preference'] ?? 'hinglish';
+    $hasWebsite = ($lead['website_status'] ?? '') === 'has_website';
+    
+    $location = $locality ?: $city;
+    $ratingText = '';
+    if (!empty($rating) && $reviews > 0) {
+        $ratingText = "{$rating} rating aur {$reviews} reviews";
+    } elseif (!empty($rating)) {
+        $ratingText = "{$rating} rating";
+    }
     
     if ($language === 'hinglish') {
-        if ($lead['pitch_type'] === 'type_b') {
-            return "Hi! Main {$city} mein local businesses ke liye digital solutions provide karta hoon. {$name} ke baare mein socha ki aapki online presence aur strong ho sakti hai. Ek simple website ya landing page se kaafi enquiries aa sakti hain. Kya aap interested hain iss baare mein baat karne mein?";
+        if ($hasWebsite) {
+            // Type A - Has Website - Hinglish
+            $msg = "Hey! Maine aapka {$name} ka profile dekha";
+            if (!empty($location)) $msg .= " — {$location} area mein";
+            $msg .= ".";
+            if (!empty($ratingText)) {
+                $msg .= " {$ratingText} ke saath kaafi solid trust build kiya hai aapne.";
+            }
+            $msg .= "\n\nWebsite bhi hai aapki, jo achhi baat hai. Lekin maine dekha ki aaj kal jo businesses apni website pe WhatsApp automation ya AI-based enquiry handling add kar rahe hain, unka conversion kaafi improve ho raha hai.";
+            $msg .= "\n\nMujhe laga ki aap jaise established business ke liye ek simple digital upgrade kaafi farak la sakta hai — jaise automated customer handling ya better lead capture.";
+            $msg .= "\n\nAgar interest ho to main ek short idea share kar sakta hoon — bilkul no pressure, sirf ek thought hai.";
+            return $msg;
         } else {
-            return "Hi! Maine {$name} ko online dekha - kaafi accha setup hai. Main {$city} mein businesses ke liye digital growth solutions provide karta hoon. Aapke existing setup mein kuch smart additions se conversions aur improve ho sakte hain. Kya aap interested hain quick discussion ke liye?";
+            // Type B - No Website - Hinglish
+            $msg = "Hey! {$name} ke baare mein Google pe dekha";
+            if (!empty($location)) $msg .= " — {$location} mein";
+            $msg .= ".";
+            if (!empty($ratingText)) {
+                $msg .= " {$ratingText} matlab log trust karte hain aap pe, quality hai aapki service mein.";
+            }
+            $msg .= "\n\nEk cheez notice ki — abhi aapki koi website ya landing page nahi hai. Matlab jo log Google pe search kar rahe hain aapke type ka business, wo aapko nahi mil pa rahe.";
+            $msg .= "\n\nEk simple professional landing page se enquiries aa sakti hain 24/7 — bina kisi extra effort ke. Maine similar businesses ke liye ye kiya hai aur result kaafi accha raha.";
+            $msg .= "\n\nKya aap interested honge ek quick chat ke liye? Sirf 2 min mein idea samjha dunga.";
+            return $msg;
         }
     }
     
-    if ($lead['pitch_type'] === 'type_b') {
-        return "Hi! I work with local businesses in {$city} on their digital presence. Noticed {$name} doesn't have a website yet - a simple landing page could help capture more enquiries from people searching online. Would you be open to a quick chat about this?";
+    // English fallback
+    if ($hasWebsite) {
+        $msg = "Hi! Came across {$name}";
+        if (!empty($location)) $msg .= " in {$location}";
+        $msg .= ".";
+        if (!empty($ratingText)) $msg .= " {$ratingText} — that's solid trust you've built.";
+        $msg .= "\n\nSaw you have a website already, which is great. One thing I've seen work well for businesses at your stage is adding WhatsApp automation or AI-based enquiry handling — helps convert more visitors into actual customers.";
+        $msg .= "\n\nI work on exactly this kind of digital upgrade for local businesses. Nothing complex, just practical improvements that actually move the needle.";
+        $msg .= "\n\nWould you be open to hearing a quick idea? No pitch, just a thought that might be relevant.";
+        return $msg;
+    } else {
+        $msg = "Hi! Found {$name}";
+        if (!empty($location)) $msg .= " in {$location}";
+        $msg .= " on Google.";
+        if (!empty($ratingText)) $msg .= " {$ratingText} — clearly doing great work.";
+        $msg .= "\n\nNoticed you don't have a website yet. In today's market, a simple landing page could help you capture enquiries from people searching for your kind of service online — 24/7, even when you're busy.";
+        $msg .= "\n\nI help local businesses set up clean, professional web presence. Simple, affordable, and designed to actually bring in customers.";
+        $msg .= "\n\nWould a quick 2-min chat be worth your time? Just wanted to share an idea.";
+        return $msg;
     }
-    
-    return "Hi! I came across {$name} online and was impressed by your setup. I help businesses in {$city} improve their digital conversions with smart solutions. Had a few ideas that might work for you. Would you be open to a brief chat?";
 }
 
 /**

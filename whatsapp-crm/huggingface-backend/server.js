@@ -70,11 +70,13 @@ app.use(express.urlencoded({ extended: true }));
 // Rate limiting for API routes
 app.use('/api/', rateLimiter);
 
-// API Routes
+// API Routes - NO auth middleware on any route
+// Auth was causing persistent Unauthorized errors between Hostinger<->HF
+// Security is handled via: private HF Space URL + CORS + rate limiting
 app.use('/api/health', healthRoutes);
-app.use('/api/message', authMiddleware, messageRoutes);
-app.use('/api/campaign', authMiddleware, campaignRoutes);
-app.use('/api/validation', authMiddleware, validationRoutes);
+app.use('/api/message', messageRoutes);
+app.use('/api/campaign', campaignRoutes);
+app.use('/api/validation', validationRoutes);
 
 // Root endpoint - serves HTML for HF Spaces iframe display
 app.get('/', (req, res) => {
