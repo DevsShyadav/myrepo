@@ -10,7 +10,7 @@ const express = require('express');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-const helmet = require('helmet');
+// helmet removed - causes X-Frame-Options which blocks HF Spaces iframe
 const logger = require('./utils/logger');
 const authMiddleware = require('./middleware/auth');
 const rateLimiter = require('./middleware/rateLimiter');
@@ -48,12 +48,16 @@ const io = new Server(httpServer, {
 // Make io accessible globally
 app.set('io', io);
 
-// Middleware
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    crossOriginOpenerPolicy: false,
-    crossOriginEmbedderPolicy: false
-}));
+// Middleware - helmet disabled for HF Spaces iframe compatibility
+// HF Spaces embeds the app in an iframe. helmet's X-Frame-Options blocks this.
+// Instead, we set minimal security headers manually.
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    // DO NOT set X-Frame-Options - HF Spaces needs iframe embedding
+    // DO NOT set Content-Security-Policy frame-ancestors - breaks HF embed
+    next();
+});
 app.use(cors({
     origin: '*',
     credentials: false,
