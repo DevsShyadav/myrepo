@@ -30,8 +30,10 @@ try {
         errorResponse('Campaign already running. Pause first before starting new batch.');
     }
     
-    // Get eligible leads: valid WhatsApp, pending outreach, not already contacted
-    $where = ["whatsapp_status = 'valid'", "outreach_status = 'pending'"];
+    // Get eligible leads: valid OR pending WhatsApp status, pending outreach, not already contacted
+    // We include 'pending' validation leads because validation may not have completed yet
+    // Invalid/not_on_whatsapp leads are excluded
+    $where = ["whatsapp_status IN ('valid', 'pending')", "outreach_status = 'pending'"];
     $params = [];
     
     if (!empty($filters['city'])) {

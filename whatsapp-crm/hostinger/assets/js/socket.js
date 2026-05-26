@@ -18,6 +18,9 @@ const SocketManager = {
             return;
         }
 
+        // HF Spaces requires direct socket connection (not iframe)
+        // Ensure URL is clean without trailing slash
+        this.socketUrl = url.replace(/\/$/, '');
         this.connect();
     },
 
@@ -26,18 +29,24 @@ const SocketManager = {
 
         try {
             this.socket = io(this.socketUrl, {
-                transports: ['websocket', 'polling'],
+                transports: ['polling', 'websocket'],
                 reconnection: true,
                 reconnectionAttempts: this.maxReconnectAttempts,
-                reconnectionDelay: 1000,
+                reconnectionDelay: 2000,
                 reconnectionDelayMax: 30000,
-                timeout: 20000
+                timeout: 30000,
+                forceNew: true,
+                path: '/socket.io/',
+                withCredentials: false,
+                extraHeaders: {}
             });
 
             this.setupEvents();
         } catch (err) {
             console.error('Socket connection error:', err);
             this.updateConnectionUI(false);
+            // Retry after 5 seconds
+            setTimeout(() => this.connect(), 5000);
         }
     },
 
@@ -152,12 +161,23 @@ const SocketManager = {
     },
 
     handleInboundMessage(data) {
-        Toast.info(`New message from ${data.phone}`);
+        Toast.info(`New reply from ${data.phone}`);
+        // Play notification sound if enabled
+        try {
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2AgIB9fXx8fH19');
+            audio.volume = 0.3;
+            audio.play().catch(() => {});
+        } catch(e) {}
+        
         if (typeof ChatManager !== 'undefined') {
             ChatManager.onNewMessage(data, 'inbound');
         }
         if (typeof LeadsManager !== 'undefined') {
             LeadsManager.refresh();
+        }
+        // Update stats
+        if (typeof App !== 'undefined') {
+            App.loadStats();
         }
     },
 

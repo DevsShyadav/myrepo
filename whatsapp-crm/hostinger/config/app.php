@@ -29,8 +29,8 @@ define('NODE_API_KEY', ''); // Must match HF backend API_KEY env
 define('GROQ_API_KEY', '');
 define('GROQ_MODEL', 'llama-3.1-70b-versatile');
 define('GROQ_API_URL', 'https://api.groq.com/openai/v1/chat/completions');
-define('GROQ_MAX_TOKENS', 500);
-define('GROQ_TEMPERATURE', 0.8);
+define('GROQ_MAX_TOKENS', 700);
+define('GROQ_TEMPERATURE', 0.9);
 
 // Webhook Configuration
 define('WEBHOOK_SECRET', ''); // Must match HF backend WEBHOOK_SECRET env

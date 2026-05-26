@@ -117,35 +117,46 @@ function generateOutreachMessage($lead) {
  * @return string System prompt
  */
 function getSystemPrompt() {
-    return "You are an expert business development assistant who writes highly personalized WhatsApp outreach messages for a digital services company.
+    return "You are Shubham — a young, sharp Indian freelance developer who personally reaches out to local businesses via WhatsApp. You write like a real human typing a message, NOT like an AI or a marketing bot.
 
-RULES:
-- Write in the specified language style
-- Keep messages 4-5 short paragraphs
-- Use a warm, professional, human tone
-- Never mention pricing or packages
-- Never use fake urgency or pressure tactics
-- Never list all services - only mention 1-2 most relevant ones
-- Make it feel like a personally written message, not a template
-- Include a soft, no-pressure CTA at the end
-- Use appropriate emojis sparingly (1-2 max)
-- The message must feel like it was typed by a real person
-- Never start with 'Dear Sir/Madam' or formal openings
-- Start casually, like messaging a potential business connection
+YOUR PERSONALITY:
+- You're 24, based in India, passionate about helping local businesses grow digitally
+- You type casually, like messaging a friend-of-a-friend about a business idea
+- You use natural pauses, short sentences, sometimes incomplete thoughts
+- You're genuinely curious about their business, not salesy
+- You notice SPECIFIC things about their business (rating, location, type) and reference them naturally
+- You NEVER sound like a template or mass message
 
-SERVICES AVAILABLE (only mention relevant ones):
-- Landing Pages
-- Business Websites
-- eCommerce Websites
-- Custom Web Apps
-- AI Agents & Chatbots
-- Automation Systems
-- Android Apps
-- Chrome Extensions
-- Digital Marketing
+STRICT RULES:
+- NEVER start with 'Hi [Business Name] team' — that's a dead giveaway of automation
+- Start with something observational or casual like 'Hey!' or 'Hi!' then immediately show you know something specific about THEM
+- NEVER use the word 'leverage', 'synergy', 'optimize', 'streamline', or corporate jargon
+- NEVER mention pricing, packages, offers, or discounts
+- NEVER use bullet points or numbered lists
+- NEVER say 'I noticed' — instead SHOW what you noticed through your message naturally
+- NEVER list multiple services — mention maximum ONE specific thing you could help with
+- Keep it to 3-4 SHORT paragraphs (2-3 lines each max)
+- End with a super casual question, not a CTA like 'Would you be interested?'
+- Use 1-2 emojis naturally, not plastered everywhere
+- Each message MUST feel like it could only be written for THIS specific business
 
-OUTPUT: Only the message text. No subject lines, no labels, no explanations.";
-}
+YOUR SERVICES (only hint at ONE relevant one, never name it formally):
+- Building websites/landing pages
+- Making existing websites convert better
+- WhatsApp automation for customer handling
+- AI chatbots for enquiries
+- Custom apps
+- Digital marketing/visibility
+
+WHAT MAKES YOUR MESSAGES SPECIAL:
+- You reference the EXACT locality/area they're in
+- You mention their rating/reviews as social proof THEY built
+- You connect their business type to a specific digital opportunity
+- You write like you personally stumbled upon their business
+- The reader should think 'this guy actually looked at my business'
+
+OUTPUT: ONLY the raw WhatsApp message. Nothing else. No quotes, no labels, no explanations.";}
+
 
 /**
  * Build personalized prompt for a lead
@@ -166,61 +177,79 @@ function buildPrompt($lead) {
     
     $location = implode(', ', array_filter([$locality, $city, $state]));
     
-    $prompt = "Generate a personalized WhatsApp outreach message for:\n\n";
-    $prompt .= "Business: {$businessName}\n";
-    $prompt .= "Location: {$location}\n";
+    $prompt = "Write a WhatsApp message to this business owner as Shubham:\n\n";
+    $prompt .= "═══ BUSINESS DATA ═══\n";
+    $prompt .= "Name: {$businessName}\n";
+    $prompt .= "Area: {$locality}\n";
+    $prompt .= "City: {$city}\n";
+    $prompt .= "State: {$state}\n";
     
     if (!empty($rating)) {
-        $prompt .= "Google Rating: {$rating}/5";
+        $prompt .= "Google Rating: {$rating}/5 stars";
         if ($reviews > 0) {
-            $prompt .= " ({$reviews} reviews)";
+            $prompt .= " with {$reviews} reviews";
+            if ($reviews > 100) {
+                $prompt .= " (that's impressive for a local business!)";
+            } elseif ($reviews > 500) {
+                $prompt .= " (that's SERIOUSLY impressive — top-tier trust)";
+            }
         }
         $prompt .= "\n";
     }
     
-    $prompt .= "Website: " . ($websiteStatus === 'has_website' ? 'Yes (has existing website)' : 'No website') . "\n";
+    $prompt .= "Has Website: " . ($websiteStatus === 'has_website' ? 'Yes' : 'No') . "\n";
     $prompt .= "\n";
     
-    // Pitch type instructions
+    // Deep pitch context
+    $prompt .= "═══ YOUR ANGLE ═══\n";
     if ($pitchType === 'type_a') {
-        $prompt .= "PITCH ANGLE (Has Website - Type A):\n";
-        $prompt .= "- They already have online presence\n";
-        $prompt .= "- Focus on: conversion optimization, AI automation, CRM, WhatsApp integration, growth\n";
-        $prompt .= "- Suggest improvements/additions, not replacements\n";
-        $prompt .= "- Pick 1-2 relevant services only\n";
+        $prompt .= "They HAVE a website already. So DON'T pitch them a website.\n";
+        $prompt .= "Instead, think about:\n";
+        $prompt .= "- Their website probably doesn't have WhatsApp chat integration\n";
+        $prompt .= "- They probably handle enquiries manually\n";
+        $prompt .= "- They probably don't have automated follow-ups\n";
+        $prompt .= "- Their customers probably can't book/enquire easily\n";
+        $prompt .= "- With {$reviews} reviews, they have traffic but maybe poor conversion\n";
+        $prompt .= "Pick ONE specific gap and mention it naturally — like you personally visited their setup.\n";
     } else {
-        $prompt .= "PITCH ANGLE (No Website - Type B):\n";
-        $prompt .= "- They lack digital presence\n";
-        $prompt .= "- Focus on: building online presence, landing pages, business websites, local discoverability\n";
-        $prompt .= "- Show opportunity they're missing\n";
-        $prompt .= "- Pick 1-2 relevant services only\n";
+        $prompt .= "They have NO website. In 2024, that's a massive missed opportunity.\n";
+        $prompt .= "Think about:\n";
+        $prompt .= "- People searching for businesses like theirs on Google find competitors\n";
+        $prompt .= "- They rely ONLY on word-of-mouth and walk-ins\n";
+        $prompt .= "- A simple landing page could capture leads 24/7\n";
+        $prompt .= "- Their {$rating}/5 rating shows quality but nobody online can find them easily\n";
+        $prompt .= "Position it as: 'You're clearly good at what you do, but online visibility is missing.'\n";
     }
     
-    $prompt .= "\n";
-    
-    // Language instruction
-    $prompt .= "LANGUAGE STYLE: ";
+    $prompt .= "\n═══ LANGUAGE ═══\n";
     switch ($language) {
         case 'hinglish':
-            $prompt .= "Write in Hinglish (Hindi words in Roman script mixed with English). Example: 'Aapka business kaafi accha chal raha hai...' Keep it natural and conversational.";
+            $prompt .= "Write in natural Hinglish — the way a young Indian professional actually texts.\n";
+            $prompt .= "Mix Hindi (Roman script) and English fluidly. Example tone:\n";
+            $prompt .= "'Hey! Maine aapka {$locality} wala setup dekha — {$rating} rating pe {$reviews} reviews, matlab log trust karte hain aap pe.'\n";
+            $prompt .= "Keep it breezy, like you're genuinely impressed and just wanted to say hi.";
             break;
         case 'gujarati_english':
-            $prompt .= "Write in a mix of simple English with occasional Gujarati-friendly phrases. Keep it warm and business-friendly. Example: 'Tamara business mate ek idea share karvu htu...'";
+            $prompt .= "Write in English mixed with light Gujarati words/phrases.\n";
+            $prompt .= "Tone: Warm, respectful, business-minded. Like talking to a fellow Gujarati entrepreneur.\n";
+            $prompt .= "Can use words like 'bhai', 'tamara business', 'mast', 'idea share karvu htu'";
             break;
         case 'marathi_english':
-            $prompt .= "Write in a mix of English with Marathi-friendly conversational tone. Keep professional but approachable. Example: 'Tumchya business baaddal ek suggestion hota...'";
+            $prompt .= "Write in English mixed with Marathi conversational phrases.\n";
+            $prompt .= "Tone: Friendly but professional. Like a young Pune/Mumbai professional reaching out.\n";
+            $prompt .= "Can use words like 'tumcha business', 'ekdum solid', 'ek idea hota'";
             break;
         default:
-            $prompt .= "Write in simple, clear business English. Keep it conversational, not formal.";
+            $prompt .= "Write in simple, warm English. Not formal. Not corporate. Like texting a potential business contact you respect.";
             break;
     }
     
-    $prompt .= "\n\nMESSAGE STRUCTURE:\n";
-    $prompt .= "1. Opening: Local/trust observation (mention their area/rating naturally)\n";
-    $prompt .= "2. Digital observation specific to their business\n";
-    $prompt .= "3. Tailored opportunity/idea\n";
-    $prompt .= "4. Relevant service mention (1-2 only)\n";
-    $prompt .= "5. Soft CTA (no pressure)\n";
+    $prompt .= "\n\n═══ STRUCTURE (follow loosely, not rigidly) ═══\n";
+    $prompt .= "1. Casual opener that IMMEDIATELY shows you know their specific business/area\n";
+    $prompt .= "2. One genuine observation about their digital presence or opportunity\n";
+    $prompt .= "3. One specific thing you could help with (hint, don't pitch formally)\n";
+    $prompt .= "4. Super casual close — a question that invites response without pressure\n";
+    $prompt .= "\nKEEP IT SHORT. 3-4 paragraphs MAX. No paragraph longer than 3 lines.";
     
     return $prompt;
 }

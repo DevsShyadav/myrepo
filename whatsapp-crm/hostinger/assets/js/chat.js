@@ -253,14 +253,28 @@ const ChatManager = {
         if (!this.currentLead) return;
 
         const phone = this.currentLead.phone_number;
-        if (data.phone === phone) {
+        // Match phone - incoming may have or may not have country code
+        const normalizedPhone = phone.replace(/^91/, '');
+        const dataPhone = (data.phone || '').replace(/^91/, '');
+        
+        if (dataPhone === normalizedPhone || data.phone === phone) {
             this.messages.push({
                 direction: direction,
-                message_text: data.message || '',
+                message_text: data.message || data.body || '',
                 timestamp: data.timestamp || new Date().toISOString(),
-                status: 'sent'
+                status: direction === 'outbound' ? 'sent' : 'delivered'
             });
             this.renderMessages();
+
+            // Mark as read if it's inbound
+            if (direction === 'inbound') {
+                Utils.api('mark_read.php', 'POST', { lead_id: this.currentLeadId }).catch(() => {});
+            }
+        }
+
+        // Always refresh leads list for unread indicators
+        if (direction === 'inbound' && typeof LeadsManager !== 'undefined') {
+            LeadsManager.refresh();
         }
     }
 };

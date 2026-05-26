@@ -178,6 +178,19 @@ const App = {
             LeadsManager.refresh();
             this.loadStats();
             fileInput.value = '';
+
+            // Auto-trigger WhatsApp number validation after import
+            if (result.imported > 0) {
+                Toast.info('Starting auto-validation of imported numbers...');
+                setTimeout(async () => {
+                    try {
+                        const valData = await Utils.api('validate_numbers.php', 'POST', { limit: result.imported });
+                        Toast.success(`Validating ${valData.submitted} numbers...`);
+                    } catch (valErr) {
+                        Toast.warning('Auto-validation could not start. Use "Validate Numbers" manually.');
+                    }
+                }, 2000);
+            }
         } catch (err) {
             Toast.error('Import failed: ' + err.message);
         }

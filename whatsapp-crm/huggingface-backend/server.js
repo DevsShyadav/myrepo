@@ -32,16 +32,17 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
     : ['*'];
 
-// Socket.io setup
+// Socket.io setup - allow all origins for HF Spaces (public HTTPS endpoint)
 const io = new Server(httpServer, {
     cors: {
-        origin: ALLOWED_ORIGINS[0] === '*' ? '*' : ALLOWED_ORIGINS,
+        origin: '*',
         methods: ['GET', 'POST'],
-        credentials: true
+        credentials: false
     },
     pingInterval: 25000,
     pingTimeout: 60000,
-    transports: ['websocket', 'polling']
+    transports: ['polling', 'websocket'],
+    allowEIO3: true
 });
 
 // Make io accessible globally
@@ -49,11 +50,15 @@ app.set('io', io);
 
 // Middleware
 app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' }
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: false,
+    crossOriginEmbedderPolicy: false
 }));
 app.use(cors({
-    origin: ALLOWED_ORIGINS[0] === '*' ? '*' : ALLOWED_ORIGINS,
-    credentials: true
+    origin: '*',
+    credentials: false,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'X-Api-Key', 'Accept', 'X-Requested-With']
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));

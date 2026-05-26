@@ -17,16 +17,22 @@ function nodeRequest($endpoint, $method = 'GET', $data = []) {
     $apiKey = getSetting('node_api_key', NODE_API_KEY);
     
     if (empty($baseUrl)) {
-        return ['error' => true, 'message' => 'Node API URL not configured'];
+        return ['error' => true, 'message' => 'Node API URL not configured. Set it in Settings > API Configuration.'];
     }
     
-    $url = rtrim($baseUrl, '/') . '/' . ltrim($endpoint, '/');
+    // Clean URL - remove trailing slash, ensure proper format
+    $baseUrl = rtrim($baseUrl, '/');
+    $url = $baseUrl . '/' . ltrim($endpoint, '/');
     
     $headers = [
         'Content-Type: application/json',
-        'X-Api-Key: ' . $apiKey,
         'Accept: application/json'
     ];
+    
+    // Only add API key header if it's configured
+    if (!empty($apiKey)) {
+        $headers[] = 'X-Api-Key: ' . $apiKey;
+    }
     
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -35,8 +41,10 @@ function nodeRequest($endpoint, $method = 'GET', $data = []) {
         CURLOPT_TIMEOUT => 30,
         CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_HTTPHEADER => $headers,
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_FOLLOWLOCATION => true
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS => 3
     ]);
     
     if ($method === 'POST') {
