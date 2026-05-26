@@ -13,3 +13,8 @@
     <div class="stat-value" id="stat-replies">0</div>
     <div class="stat-sub">Rate: <span id="stat-reply-rate">0%</span></div>
 </div>
+<div class="stat-card">
+    <div class="stat-label">Unread</div>
+    <div class="stat-value" id="stat-unread">0</div>
+    <div class="stat-sub">Pending: <span id="stat-pending">0</span></div>
+</div>

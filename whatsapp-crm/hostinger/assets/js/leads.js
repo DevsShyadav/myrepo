@@ -60,6 +60,9 @@ const LeadsManager = {
             this.leads = data.leads || [];
             this.totalPages = data.total_pages || 1;
             this.renderLeads();
+            // Update leads count
+            const countEl = document.getElementById('leads-count');
+            if (countEl) countEl.textContent = (data.total || this.leads.length) + ' total';
         } catch (err) {
             Toast.error('Failed to load leads');
         }

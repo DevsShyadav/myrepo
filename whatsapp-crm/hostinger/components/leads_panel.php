@@ -1,10 +1,13 @@
 <section class="leads-panel">
     <!-- Header with Search -->
     <div class="leads-header">
-        <h2>Leads</h2>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <h2>Leads</h2>
+            <span id="leads-count" style="font-size:11px;color:var(--text-muted);background:var(--bg-surface);padding:3px 8px;border-radius:10px">0 total</span>
+        </div>
         <div class="search-box">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input type="text" id="leads-search" placeholder="Search leads..." autocomplete="off">
+            <input type="text" id="leads-search" placeholder="Search by name, phone, city..." autocomplete="off">
         </div>
     </div>
 

@@ -1,16 +1,17 @@
 <div class="campaign-widget">
     <div class="campaign-status">
-        <span style="font-size:12px;font-weight:600">Campaign</span>
-        <span id="campaign-status-text" class="text-muted" style="font-size:11px;font-weight:500">Idle</span>
+        <span style="font-size:12px;font-weight:600">Status</span>
+        <span id="campaign-status-text" class="text-muted" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--bg-surface)">Idle</span>
     </div>
-    <div class="campaign-progress">
+    <div class="campaign-progress" style="margin-top:8px">
         <div class="bar" id="campaign-progress-bar" style="width:0%"></div>
     </div>
-    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">
-        Sent: <span id="campaign-sent-today">0/50</span>
+    <div style="font-size:11px;color:var(--text-muted);margin:6px 0 10px;display:flex;justify-content:space-between">
+        <span>Sent: <strong id="campaign-sent-today">0/50</strong></span>
+        <span>Queue: <strong id="queue-count">0</strong></span>
     </div>
-    <div class="form-group" style="margin-bottom:8px">
-        <label style="font-size:11px">Batch Size</label>
+    <div class="form-group" style="margin-bottom:10px">
+        <label style="font-size:11px;margin-bottom:4px">Batch Size (1-50)</label>
         <input type="number" id="campaign-batch-size" class="form-control" value="20" min="1" max="50" style="padding:6px 10px;font-size:12px">
     </div>
     <div class="campaign-actions">
